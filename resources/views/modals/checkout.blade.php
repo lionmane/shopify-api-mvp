@@ -36,7 +36,7 @@
                 <h4>Checkout data</h4>
                 <br>
 
-                <form action="">
+                <form action="/charge" method="post" id="payment-form">
                     <div class="row">
                         {{-- Aackas: Place checkout fields here--}}
                         <div class="col-md-5">
@@ -52,20 +52,35 @@
                             <input class="form-control" type="text" name="last_name">
                         </div>
                     </div>
-
+                    <div class="row">
+                        <div class="col-md-5">
+                            <label for="">Email</label>
+                            <input class="form-control" type="text" name="email">
+                        </div>
+                        <div class="col-md-5">
+                            <label for="">Shipping Address</label>
+                            <input class="form-control" type="text" name="shipping_address">
+                        </div>
+                        
+                    </div>
                     <br>
                     <br>
 
                     <div class="row">
-                        <div class="col-md-5">
-                            <label for="">CC number</label>
-                            <input class="form-control" type="text" name="cc">
+                        <div class="col-md-12">
+                        <label for="card-element">
+                          Credit or debit card
+                        </label>
+                        <div id="card-element">
+                          <!-- A Stripe Element will be inserted here. -->
                         </div>
-                        <div class="col-md-2">
-                            <label for="">CVC</label>
-                            <input class="form-control" type="text" name="cvc">
-                        </div>
+
+                        <!-- Used to display form errors. -->
+                        <div id="card-errors" role="alert"></div>
                     </div>
+                    </div>
+                    <br><br>
+                    <button class="btn btn-primary btn-md">Submit Payment</button>
                 </form>
             </div>
             <div class="modal-footer">
