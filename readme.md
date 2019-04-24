@@ -12,9 +12,11 @@ This is a simple MVP to showcase integration of Shopify with a Laravel backend.
 
  1. Run `composer install` to install all dependences
  2. Create the `.env` file and put the appropriate content in (ask Mario)
- 3. Run `./artisan migrate` to create the necessary DB tables
- 4. Run `./artisan db:seed` to create the initial DB data
- 5. Run `./artisan serve` to startup the development webserver
+ 3. Create a new database using your RDBMS of choice (MySQL or Postgres recommended)
+ 4. Change the database (DB_CONNECTION, DB_DATABASE, DB_USERNAME, etc) information in the `.env` file to match your environment
+ 5. Run `./artisan migrate` to create the necessary DB tables
+ 6. Run `./artisan db:seed` to create the initial DB data
+ 7. Run `./artisan serve` to startup the development webserver
 
 ## Creating and modifying database tables
  
