@@ -36,8 +36,14 @@
                 integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
                 crossorigin="anonymous"></script>
         <script src="https://js.stripe.com/v3/"></script>   
-        <script src="https://js.braintreegateway.com/js/braintree-2.32.1.min.js"></script>
-        @yield('scripts')
+        <script src="https://js.braintreegateway.com/web/dropin/1.8.1/js/dropin.min.js"></script>        @yield('scripts')
+        <!-- Load the required client component. -->
+        <script src="https://js.braintreegateway.com/web/3.44.2/js/client.min.js"></script>
+
+        <!-- Load Hosted Fields component. -->
+        <script src="https://js.braintreegateway.com/web/3.44.2/js/hosted-fields.min.js"></script>
+
+
     </head>
     <body>
         <nav class="navbar navbar-default">

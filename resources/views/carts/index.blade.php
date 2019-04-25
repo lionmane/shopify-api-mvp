@@ -119,11 +119,34 @@
                 open_items_modal($(this).data('cart-id'));
             });
 
-            $('a.checkout-cart').click(function (e) {
+            $('a.checkout-cart').click(function(e) {
                 e.preventDefault();
                 open_checkout_modal($(this).data('cart-id'));
             });
-           
+            var button = document.querySelector('#submit-button');
+            
+            braintree.dropin.create({
+              authorization: "{{ Braintree_ClientToken::generate() }}",
+              container: '#dropin-container'
+            }, function(createErr, instance) {
+              button.addEventListener('click', function(event) {
+                event.preventDefault();
+                var formdata = $('#payment-form1').serializeArray().reduce(function(obj, item) {
+                    obj[item.name] = item.value;
+                    return obj;
+                }, {});
+                instance.requestPaymentMethod(function(err, payload) {
+                  $.get('{{ route('payment.process') }}', {payload,formdata}, function (response) {
+                    // console.log(response);
+                    if (response.success) {
+                      alert('Payment successfull!');
+                    } else {
+                      alert('Payment failed');
+                    }
+                  }, 'json');
+                });
+              });
+            });
               // Create a Stripe client.
         var stripe = Stripe('pk_test_e0g2QwVAoOangt3FEtQ6Bkno00lcLJFx0b');
 

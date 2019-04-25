@@ -26,7 +26,7 @@ Route::get('cart/{cart_id}/items', 'CartsController@get_cart_items');
 Route::get('cart/{cart_id}/info', 'CartsController@get_cart_info');
 Route::post('cart/{cart_id}/checkout', 'CheckoutController@checkout');
 Route::post('charge', 'CheckoutController@charge');
-
+Route::get('/payment/process', 'CheckoutController@braintreePaymentprocess')->name('payment.process');
 //Route::post('cart/{customer_id}', function($customer_id) {
 //    $customer = \App\Library\CustomerHelper::customer_by_id($customer_id);
 //    $cart = new \App\Cart();
