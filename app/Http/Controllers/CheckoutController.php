@@ -16,6 +16,7 @@ class CheckoutController extends Controller
     }
     public function charge(Request $request)
     {
+    	
         Stripe::setApiKey(env('STRIPE_SECRET'));
 
         $customer = Customer::create(array(

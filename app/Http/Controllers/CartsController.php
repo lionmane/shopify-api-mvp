@@ -87,6 +87,31 @@ class CartsController extends Controller
     {
         try {
             $cart = Cart::findOrFail($cart_id);
+            $client = \TaxJar\Client::withApiKey($_ENV['TAXJAR_API_KEY']);
+            $client->setApiConfig('headers', [
+              'X-TJ-Expected-Response' => 422
+            ]);
+            $tax = $client->taxForOrder([
+              'from_country' => 'US',
+              'from_zip' => '10001',
+              'from_state' => 'NY',
+              'from_city' => 'New York',
+              'from_street' => 'Hudson Yards',
+              'to_country' => 'US',
+              'to_zip' => '07306',
+              'to_state' => 'NJ',
+              'to_city' => 'Jersey City',
+              'to_street' => '54 Journal Square Plaza',
+              'amount' => $cart->items[0]->total_price,
+              'shipping' => 10,
+              'line_items' => [
+                [
+                  'quantity' => $cart->items[0]->quantity,
+                  'unit_price' => $cart->items[0]->unit_price
+                ]
+              ]
+            ]);
+
             return [
                 'id' => $cart->id,
                 'cart' => $cart->toArray(),
