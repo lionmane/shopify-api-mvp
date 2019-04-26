@@ -13,11 +13,6 @@ class DraftOrderHelper
 {
     protected static function fetch_orders()
     {
-        // Return cached orders if possible
-        if ($response = CacheFileHelper::load('draft_orders.json')) {
-            return $response;
-        }
-
         try {
             $url = APIHelper::get_url("/admin/api/2019-04/draft_orders.json");
             $orders = CurlHelper::exec($url);
@@ -36,14 +31,15 @@ class DraftOrderHelper
         return $orders;
     }
 
-    public static function prepare_order($cart)
+    public static function prepare_order($cart, $name='', $notes='')
     {
         $json = [
             'line_items' => [],
             'customer' => [
-                'id' => $cart->customer_id,
-                'email' => $cart->customer_email
+                'id' => $cart->customer_id
             ],
+            'name' => $name,
+            'note' => $notes,
             "use_customer_default_address" => true
         ];
         foreach ($cart->items as $item) {
@@ -52,7 +48,7 @@ class DraftOrderHelper
                 'requires_shipping' => false,
                 'product_id' => $item->product_id,
                 'variant_id' => $item->variant_id,
-                'quantity' => 1,
+                'quantity' => $item->quantity,
             ];
             break;
         }
@@ -60,20 +56,16 @@ class DraftOrderHelper
         return ["draft_order" => $json];
     }
 
-    public static function create_order($cart)
+    public static function create_order($cart, $name='', $notes='')
     {
-        $data = self::prepare_order($cart);
+        $data = self::prepare_order($cart, $name, $notes);
         $url = APIHelper::get_url("/admin/api/2019-04/draft_orders.json");
-        $ch = curl_init($url);
-        curl_setopt($ch, CURLOPT_POST, 1);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($ch, CURLOPT_HEADER, ['Content-Type' => 'application/json']);
-        $response = curl_exec($ch);
-        if (curl_errno($ch)) {
-            error_log("ERROR: " . curl_error($ch));
-        }
-        curl_close($ch);
+        $headers = [
+            'X-Shopify-Access-Token: ' . env('SHOPIFY_SECRET'),
+            'content-type: application/json; charset=utf-8'
+        ];
+
+        $response = CurlHelper::exec($url, 'POST', json_encode($data), $headers, 1, false);
         return $response;
     }
 }
