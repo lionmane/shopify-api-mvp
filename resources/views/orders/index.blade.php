@@ -14,8 +14,7 @@
                         <th>Order Name</th>
                         <th>Status</th>
                         <th>Total Price</th>
-                        <th>First Name</th>
-                        <th>Last Name</th>
+                        <th>Note</th>
                         <th>Email</th>
                     </tr>
                     </thead>
@@ -25,10 +24,9 @@
                             <td>{{ $index }}</td>
                             <td>{{ $order['id'] }}</td>
                             <td>{{ $order['name'] }}</td>
-                            <td>{{ $order['status'] }}</td>
+                            <td>{{ ucfirst($order['status']) }}</td>
                             <td>{{ $order['total_price'] }}</td>
-                            <td>{{ $order['customer']['first_name'] }}</td>
-                            <td>{{ $order['customer']['last_name'] }}</td>
+                            <td>{{ $order['note'] }}</td>
                             <td>{{ $order['customer']['email'] }}</td>
                         </tr>
                     @endforeach

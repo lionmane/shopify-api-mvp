@@ -27,7 +27,7 @@
                             <td>{{ $cart->customer_first_name }}</td>
                             <td>{{ $cart->customer_last_name }}</td>
                             <td>{{ $cart->customer_email }}</td>
-                            <td>{{ $cart->status() }}</td>
+                            <td>{{ ucfirst($cart->status) }}</td>
                             <td>{{ $cart->total() }}</td>
                             <td>
                                 <a href="#"
@@ -36,13 +36,15 @@
                                    class="view-cart-items">
                                     <i class="glyphicon glyphicon-info-sign"></i>
                                 </a>
-                                &nbsp;
+
+                                @if ($cart->status == 'open')
                                 <a href="#"
                                    title="Checkout this cart"
                                    data-cart-id="{{ $cart->id }}"
                                    class="checkout-cart">
                                     <i class="glyphicon glyphicon-credit-card"></i>
                                 </a>
+                                @endif
                             </td>
                         </tr>
                     @endforeach
@@ -121,6 +123,8 @@
 
             $('a.checkout-cart').click(function (e) {
                 e.preventDefault();
+                $('a.checkout-cart').removeAttr('data-active');
+                $(this).attr('data-active', true);
                 open_checkout_modal($(this).data('cart-id'));
             });
         });
