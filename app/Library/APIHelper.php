@@ -15,7 +15,8 @@ class APIHelper
     {
         $key = env('SHOPIFY_KEY');
         $secret = env('SHOPIFY_SECRET');
-        $initial_url = "https://$key:$secret@the-conservatory-nyc.myshopify.com";
+        $store = env('SHOPIFY_NAME');
+        $initial_url = "https://$key:$secret@$store.myshopify.com";
         if ($uri !== false) {
             if ($uri[0] != '/')
                 $initial_url = $initial_url . '/';
