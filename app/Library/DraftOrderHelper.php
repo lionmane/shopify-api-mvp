@@ -65,7 +65,6 @@ class DraftOrderHelper
             'content-type: application/json; charset=utf-8'
         ];
 
-        $response = CurlHelper::exec($url, 'POST', json_encode($data), $headers, 1, false);
-        return $response;
+        return CurlHelper::exec($url, 'POST', json_encode($data), $headers, 1, false);
     }
 }
