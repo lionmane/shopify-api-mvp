@@ -11,20 +11,16 @@ class VendorSeeder extends Seeder
      */
     public function run()
     {
-        $vendor = new \App\Vendor();
-        $vendor->display_name = env('VENDOR_1_DISPLAY_NAME');
-        $vendor->name = env('VENDOR_1_NAME');
-        $vendor->shop_url = env('VENDOR_1_NAME') . '.myshopify.com';
-        $vendor->shop_key =env('VENDOR_1_KEY');
-        $vendor->shop_secret = env('VENDOR_1_SECRET');
-        $vendor->save();
-
-        $vendor = new \App\Vendor();
-        $vendor->display_name = env('VENDOR_2_DISPLAY_NAME');
-        $vendor->name = env('VENDOR_2_NAME');
-        $vendor->shop_url = env('VENDOR_2_NAME') . '.myshopify.com';
-        $vendor->shop_key =env('VENDOR_2_KEY');
-        $vendor->shop_secret = env('VENDOR_2_SECRET');
-        $vendor->save();
+        $count = env('VENDOR_COUNT', 0);
+        for ($i=1; $i <= $count; ++$i) {
+            $vendor = new \App\Vendor();
+            $prefix = 'VENDOR_' . $i;
+            $vendor->display_name = env($prefix . '_DISPLAY_NAME');
+            $vendor->name = env($prefix . '_NAME');
+            $vendor->shop_url = env($prefix . '_NAME') . '.myshopify.com';
+            $vendor->shop_key = env($prefix . '_KEY');
+            $vendor->shop_secret = env($prefix . '_SECRET');
+            $vendor->save();
+        }
     }
 }
