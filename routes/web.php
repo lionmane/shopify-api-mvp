@@ -25,3 +25,6 @@ Route::post('cart/{cart_id}/product/{variant_id}/quantity/{quantity_id}', 'Carts
 Route::get('cart/{cart_id}/items', 'CartsController@get_cart_items');
 Route::get('cart/{cart_id}/info', 'CartsController@get_cart_info');
 Route::post('cart/{cart_id}/checkout', 'DraftOrdersController@create');
+Route::post('charge/{cart_id}', 'CheckoutController@charge');
+
+Route::get('payments', 'CheckoutController@payments');

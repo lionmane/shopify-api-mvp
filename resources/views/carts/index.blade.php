@@ -38,12 +38,12 @@
                                 </a>
 
                                 @if ($cart->status == 'open')
-                                <a href="#"
-                                   title="Checkout this cart"
-                                   data-cart-id="{{ $cart->id }}"
-                                   class="checkout-cart">
-                                    <i class="glyphicon glyphicon-credit-card"></i>
-                                </a>
+                                    <a href="#"
+                                       title="Checkout this cart"
+                                       data-cart-id="{{ $cart->id }}"
+                                       class="checkout-cart">
+                                        <i class="glyphicon glyphicon-credit-card"></i>
+                                    </a>
                                 @endif
                             </td>
                         </tr>
@@ -63,7 +63,7 @@
             $('.cart-items tbody tr', modal).remove();
             $.ajax({
                 url: '/cart/' + cart_id + '/items',
-                success: function(response) {
+                success: function (response) {
                     show_items(response, modal);
                     modal.modal();
                 }
@@ -75,13 +75,15 @@
             $('.cart-items tbody tr', modal).remove();
             $.ajax({
                 url: '/cart/' + cart_id + '/info',
-                success: function(response) {
+                success: function (response) {
                     $('.cart-id', modal).html(response.id);
                     $('.customer', modal).html(response.customer);
                     $('.total', modal).html(response.total);
 
                     $('[name=first_name]').val(response.cart.customer_first_name);
                     $('[name=last_name]').val(response.cart.customer_last_name);
+
+                    $('form').attr('action', 'charge/' + cart_id);
                     modal.modal();
                 }
             });
@@ -92,7 +94,7 @@
             $('table tbody tr', modal).remove();
             var quantity = 0;
             var total = 0;
-            for (var i=0; i<items.length; ++i) {
+            for (var i = 0; i < items.length; ++i) {
                 console.log(items[i]);
                 quantity += items[i].quantity;
                 total += items[i].total_price;
@@ -100,7 +102,13 @@
             }
 
             var empty_item = {variant_id: '&nbsp;', product_name: '', unit_price: '', quantity: '', total_price: ''};
-            var total_item = {variant_id: '', product_name: '', unit_price: '', quantity: '<strong>TOTAL</strong>', total_price: total};
+            var total_item = {
+                variant_id: '',
+                product_name: '',
+                unit_price: '',
+                quantity: '<strong>TOTAL</strong>',
+                total_price: total
+            };
             $('table tbody', modal).append(tr(empty_item));
             $('table tbody', modal).append(tr(total_item));
         }
@@ -115,7 +123,7 @@
             return tr;
         }
 
-        $(function() {
+        $(function () {
             $('a.view-cart-items').click(function (e) {
                 e.preventDefault();
                 open_items_modal($(this).data('cart-id'));
@@ -126,6 +134,50 @@
                 $('a.checkout-cart').removeAttr('data-active');
                 $(this).attr('data-active', true);
                 open_checkout_modal($(this).data('cart-id'));
+            });
+
+
+            // Create a Stripe client.
+            var stripe = Stripe('pk_test_e0g2QwVAoOangt3FEtQ6Bkno00lcLJFx0b');
+            window.stripe = stripe;
+
+            // Create an instance of Elements.
+            var elements = stripe.elements();
+
+            // Custom styling can be passed to options when creating an Element.
+            // (Note that this demo uses a wider set of styles than the guide below.)
+            var style = {
+                base: {
+                    color: '#32325d',
+                    lineHeight: '18px',
+                    fontFamily: '"Helvetica Neue", Helvetica, sans-serif',
+                    fontSmoothing: 'antialiased',
+                    fontSize: '16px',
+                    '::placeholder': {
+                        color: '#aab7c4'
+                    }
+                },
+                invalid: {
+                    color: '#fa755a',
+                    iconColor: '#fa755a'
+                }
+            };
+
+            // Create an instance of the card Element.
+            var card = elements.create('card', {style: style});
+            window.card = card;
+
+            // Add an instance of the card Element into the `card-element` <div>.
+            card.mount('#card-element');
+
+            // Handle real-time validation errors from the card Element.
+            card.addEventListener('change', function (event) {
+                var displayError = document.getElementById('card-errors');
+                if (event.error) {
+                    displayError.textContent = event.error.message;
+                } else {
+                    displayError.textContent = '';
+                }
             });
         });
     </script>
