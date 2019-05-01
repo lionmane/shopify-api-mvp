@@ -61,7 +61,7 @@
                 <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                     <ul class="nav navbar-nav">
                         <li @if($active == 'products')class="active"@endif><a href="/products">Products <span class="sr-only">(current)</span></a></li>
-                        <li @if($active == 'customers')class="active"@endif><a href="/customers">Customers</a></li>
+{{--                        <li @if($active == 'customers')class="active"@endif><a href="/customers">Customers</a></li>--}}
                         <li @if($active == 'draft_orders')class="active"@endif><a href="/draft_orders">Draft Orders</a></li>
                         <li @if($active == 'carts')class="active"@endif><a href="/carts">Carts</a></li>
 {{--

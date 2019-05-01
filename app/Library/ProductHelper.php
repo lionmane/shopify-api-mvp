@@ -1,6 +1,9 @@
 <?php
 
 namespace App\Library;
+use App\Product;
+use App\ProductVariant;
+use App\Vendor;
 use Psy\Exception\ErrorException;
 
 /**
@@ -17,14 +20,15 @@ class ProductHelper
      *
      * @return array
      */
-    public static function fetch_products()
+    public static function fetch_products(Vendor $vendor)
     {
         // Return cached products if possible
-        if (false !== ($response = CacheFileHelper::load('products.json', 6000))) {
-            return $response;
-        }
+//        $cache_file = $vendor->get_cache_file('products.json');
+//        if (false !== ($response = CacheFileHelper::load($cache_file, 6000))) {
+//            return $response;
+//        }
 
-        $initial_url = APIHelper::get_url("/admin/api/2019-04/products.json");
+        $initial_url = $vendor->url("/admin/api/2019-04/products.json");
 
         $query_url = "";
         $products = [];
@@ -53,7 +57,7 @@ class ProductHelper
         } while ($max_iterations > 0);
 
         // Cache all results
-        file_put_contents(base_path('products.json'), json_encode($products, JSON_PRETTY_PRINT));
+//        file_put_contents(base_path($cache_file), json_encode($products, JSON_PRETTY_PRINT));
 
         return $products;
     }
@@ -63,9 +67,9 @@ class ProductHelper
      *
      * @return array
      */
-    public static function get_products()
+    public static function get_products($vendor)
     {
-        $products = self::fetch_products();
+        $products = self::fetch_products($vendor);
         $results = [];
         foreach ($products as $product) {
             self::get_product_variants($product, $results);
@@ -123,5 +127,45 @@ class ProductHelper
         $products = self::get_products();
         $products = array_combine(array_column($products, 'variant_id'), $products);
         return $products[$id];
+    }
+
+    protected static function get_product_from_db($vendor_id, $product_id, $metadata)
+    {
+        $product = Product::query()
+            ->where('vendor_id', $vendor_id)
+            ->where('shopify_product_id', $product_id)
+            ->first();
+
+        if (!$product) {
+            $product = new Product();
+            $product->vendor_id = $vendor_id;
+            $product->shopify_product_id = $product_id;
+            $product->metadata = is_array($metadata) ? json_encode($metadata) : $metadata;
+            $product->save();
+        }
+
+        return $product;
+    }
+
+    protected static function get_product_variant_from_db($product, $product_id, $variant_id, $metadata, $default_image, $price)
+    {
+        $variant = ProductVariant::query()
+            ->where('shopify_product_id', $product_id)
+            ->where('shopify_variant_id', $variant_id)
+            ->first();
+
+        if (!$variant) {
+            $variant = new ProductVariant();
+            $variant->product_id = $product->id;
+            $variant->vendor_id = $product->vendor_id;
+            $variant->shopify_product_id = $product_id;
+            $variant->shopify_variant_id = $variant_id;
+            $variant->metadata = is_array($metadata) ? json_encode($metadata) : $metadata;
+            $variant->default_image_url = $default_image;
+            $variant->price = $price;
+            $variant->save();
+        }
+
+        return $variant;
     }
 }

@@ -6,6 +6,7 @@ use App\Cart;
 use App\Library\DraftOrderHelper;
 use App\Order;
 use App\Payment;
+use App\ShopifyOrder;
 use Illuminate\Http\Request;
 use Stripe\Stripe;
 use Stripe\Customer;
@@ -27,12 +28,6 @@ class CheckoutController extends Controller
             if ($cart->status != 'open') {
                 throw new \Exception('This cart is already draft or checkout mode, it can no longer be checked out');
             }
-
-            // Create the Draft Order
-            $name = $request->get('name');
-            $notes = $request->get('notes');
-            $response = DraftOrderHelper::create_order($cart, $name, $notes);
-            dd($response);
 
             $customer = Customer::create(array(
                 'email' => $request->email,
@@ -63,15 +58,21 @@ class CheckoutController extends Controller
                 throw new \Exception($message);
             }
 
-            // Create the Draft Order
             $name = $request->get('name');
             $notes = $request->get('notes');
             $response = DraftOrderHelper::create_order($cart, $name, $notes);
-            dd($response);
-            $response = json_decode($response, true)['draft_order'];
+            $draft_orders = [];
+            foreach ($response as $vendor_id => $order) {
+                $shopify_order = new ShopifyOrder();
+                $shopify_order->vendor_id = $vendor_id;
+                $shopify_order->shopify_id = $order['draft_order']['id'];
+                $shopify_order->cart_id = $cart->id;
+                $shopify_order->url = '';
+                $shopify_order->save();
+                $draft_orders[] = $shopify_order->toArray();
+            }
 
             // Add draft order details to the cart
-            $cart->draft_order_id = $response['id'];
             $cart->drafted_at = \Carbon\Carbon::now();
             $cart->status = 'draft';
             $cart->save();
@@ -97,7 +98,7 @@ class CheckoutController extends Controller
             $order = new Order();
             $order->cart_id = $cart->id;
             $order->payment_id = $payment->id;
-            $order->shopify_order_id = $response['id'];
+            $order->shopify_order_id = 0;
             $order->status = 'pending';
             $order->save();
 
@@ -105,12 +106,21 @@ class CheckoutController extends Controller
                 'status' => 'ok',
                 'message' => 'Charge was successful',
                 'payment' => $payment->toArray(),
-                'order' => $order->toArray()
+                'order' => $order->toArray(),
+                'draft_orders' => $draft_orders
             ]);
 
         } catch (\Exception $error) {
-            return response($error->getTraceAsString(), 500);
+            return response([
+                'trace' => $error->getTraceAsString(),
+                'message' => $error->getMessage()
+            ], 500, ['content-type' => 'application/json']);
         }
+    }
+
+    public function create_draft_orders()
+    {
+
     }
 
     public function payments()

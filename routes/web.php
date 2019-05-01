@@ -22,6 +22,7 @@ Route::get('draft_orders', 'DraftOrdersController@index');
 Route::get('carts', 'CartsController@index');
 Route::post('cart/{customer_id}', 'CartsController@create_cart');
 Route::post('cart/{cart_id}/product/{variant_id}/quantity/{quantity_id}', 'CartsController@add_item_to_cart');
+Route::post('cart/add-product/{variant_id}/quantity/{quantity_id}', 'CartsController@add_item_to_cart_v2');
 Route::get('cart/{cart_id}/items', 'CartsController@get_cart_items');
 Route::get('cart/{cart_id}/info', 'CartsController@get_cart_info');
 Route::post('cart/{cart_id}/checkout', 'DraftOrdersController@create');

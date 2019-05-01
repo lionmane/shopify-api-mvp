@@ -12,4 +12,14 @@ class CartItem extends Model
     {
         return $this->belongsTo('\App\Cart');
     }
+
+    public function product()
+    {
+        return $this->belongsTo('\App\Product');
+    }
+
+    public function variant()
+    {
+        return $this->belongsTo('\App\ProductVariant');
+    }
 }

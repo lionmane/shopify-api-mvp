@@ -6,6 +6,8 @@ use App\Cart;
 use App\CartItem;
 use App\Library\CustomerHelper;
 use App\Library\ProductHelper;
+use App\Product;
+use App\ProductVariant;
 use Illuminate\Http\Request;
 
 class CartsController extends Controller
@@ -70,6 +72,51 @@ class CartsController extends Controller
             ]);
         } catch (\Exception $error) {
             return response($error->getMessage(), 500);
+        }
+    }
+
+    public function add_item_to_cart_v2(Request $request, $variant_id, $quantity)
+    {
+        try {
+            $cart = Cart::where('status', 'open')->first();
+            if (!$cart) {
+                $cart = new Cart();
+                $cart->customer_id = 0;
+                $cart->save();
+            }
+            $cart_item = CartItem::query()
+                ->where('cart_id', $cart->id)
+                ->where('variant_id', $variant_id)
+                ->first();
+            if (!$cart_item) {
+                $product = Product::find_by_variant_id($variant_id);
+                $variant = ProductVariant::query()->where('shopify_variant_id', $variant_id)->first();
+                $cart_item = new CartItem();
+                $cart_item->cart_id = $cart->id;
+                $cart_item->product_id = $product->id;
+                $cart_item->variant_id = $variant->id;
+                $cart_item->quantity = 0; // Intentionally start at zero, so we can easily ADD quantity
+                $cart_item->product_name = $product->get_metadata_field('title');
+                $cart_item->variant_name = $variant->get_metadata_field('name');
+                $cart_item->unit_price = $variant->get_metadata_field('price');
+                $cart_item->total_price = 0;
+            }
+
+            // Add the new quantity and update the item total
+            $cart_item->quantity += $quantity;
+            $cart_item->total_price = $cart_item->quantity * $cart_item->unit_price;
+
+            // Save the cart item
+            $cart_item->save();
+
+            return response()->json([
+                'status' => 'success'
+            ]);
+        } catch (\Exception $error) {
+            return response([
+                'message' => $error->getMessage(),
+                'trace' => $error->getTraceAsString()
+            ], 500, ['content-type' => 'application/json']);
         }
     }
 
