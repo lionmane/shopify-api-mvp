@@ -9,25 +9,24 @@
                 <table class="table">
                     <thead>
                     <tr>
-                        <th>#</th>
                         <th>ID</th>
                         <th width="10%">Vendor</th>
                         <th width="50%">Name</th>
                         <th>Variant</th>
                         <th>Price</th>
                         <th>Image</th>
+                        <th></th>
                     </tr>
                     </thead>
                     <tbody>
                     @foreach($products as $index => $product)
                         <tr>
-                            <td>{{ $index + 1 }}</td>
                             <td>{{ $product['variant_id'] }}</td>
                             <td>{{ $product['vendor'] }}</td>
                             <td>{{ $product['name'] }}</td>
                             <td>{{ $product['variant_name'] }}</td>
                             <td>{{ $product['price'] }}</td>
-                            <td>
+                            <td style="width: 100px;">
                                 <img style="max-height:84px;" src="{{ $product['image'] }}" alt="$name - $variant_name">
                             </td>
                             <td style="vertical-align: middle;">
@@ -44,7 +43,7 @@
             </div>
         </div>
     </div>
-    @include('modals.choose-cart', ['carts' => $carts])
+    @include('modals.choose-cart-v2', ['carts' => $carts])
 @stop
 @section('scripts')
     <script type="text/javascript">
@@ -54,7 +53,7 @@
                 $('a.add-to-cart').removeAttr('data-active');
                 $(this).attr('data-active', 'true');
 
-                $('#choose-cart-modal').modal();
+                $('#choose-cart-modal-v2').modal();
             })
         });
     </script>
