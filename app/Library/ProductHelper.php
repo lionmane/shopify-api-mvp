@@ -72,7 +72,8 @@ class ProductHelper
         $products = self::fetch_products($vendor);
         $results = [];
         foreach ($products as $product) {
-            self::get_product_variants($product, $results);
+            $product_db = self::get_product_from_db($vendor->id, $product['id'], $product);
+            self::get_product_variants($product_db, $results);
         }
         return $results;
     }
@@ -84,8 +85,10 @@ class ProductHelper
      * @param $product
      * @param $results
      */
-    public static function get_product_variants($product, &$results)
+    public static function get_product_variants($product_db, &$results)
     {
+        $product = $product_db->get_metadata();
+
         // Get a dictionary of images (will be necessary for mapping variant images
         $images = array_combine(array_column($product['images'], 'id'), $product['images']);
         $default_image = $product['image'];
@@ -102,7 +105,7 @@ class ProductHelper
             else
                 $image = $default_image['src'];
 
-            $results[] = [
+            $metadata = [
                 'id' => $product['id'],
                 'product_id' => $product['id'],
                 'variant_id' => $variant_id,
@@ -112,6 +115,10 @@ class ProductHelper
                 'price' => $price,
                 'image' => $image
             ];
+
+            self::get_product_variant_from_db($product_db, $product['id'], $variant_id, $metadata, $image, $price);
+
+            $results[] = $metadata;
         }
     }
 
