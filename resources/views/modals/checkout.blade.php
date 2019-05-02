@@ -25,6 +25,7 @@
                     <div class="col-md-3">
                         <div style="padding: 4px; background-color: gainsboro; text-align: center;">
                             <h1 class="total"></h1>
+                            <span class="actual_total" style="display:none"></span>
                             <br>
                             <label for="">Total</label>
                         </div>

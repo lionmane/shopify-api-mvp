@@ -16,23 +16,23 @@ class CartsController extends Controller
     {
         $carts = Cart::query()->whereNull('order_id')->get();
         $user = new User;
-            // Try and validate the address
-            $validate = Shipping::validateAddress($user);
+         // Try and validate the address
+         $validate = Shipping::validateAddress($user);
 
-            // Make sure it's not an invalid address this
-            // could also be moved to a custom validator rule
-            if ($validate->object_state == 'INVALID') {
-                return back()->withMessages($validate->messages);
-            }
-            $product = array(
-                'length'=> '5',
-                'width'=> '5',
-                'height'=> '5',
-                'distance_unit'=> 'in',
-                'weight'=> '2',
-                'mass_unit'=> 'lb',
-            );
-            $rates = Shipping::rates($user, $product);
+         // Make sure it's not an invalid address this
+         // could also be moved to a custom validator rule
+         if ($validate->object_state == 'INVALID') {
+             return back()->withMessages($validate->messages);
+         }
+         $product = array(
+            'length'=> '5',
+            'width'=> '5',
+            'height'=> '5',
+            'distance_unit'=> 'in',
+            'weight'=> '2',
+            'mass_unit'=> 'lb',
+        );
+        $rates = Shipping::rates($user, $product);
         return view('carts.index', [
             'carts' => $carts,
             'rates' => $rates->rates
