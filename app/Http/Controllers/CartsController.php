@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Cart;
 use App\CartItem;
+use App\User;
+use App\Services\Shipping;
 use App\Library\CustomerHelper;
 use App\Library\ProductHelper;
 use App\Product;
@@ -15,8 +17,26 @@ class CartsController extends Controller
     public function index()
     {
         $carts = Cart::query()->whereNull('order_id')->get();
+                $user = new User;
+         // Try and validate the address
+         $validate = Shipping::validateAddress($user);
+         // Make sure it's not an invalid address this
+         // could also be moved to a custom validator rule
+         if ($validate->object_state == 'INVALID') {
+             return back()->withMessages($validate->messages);
+         }
+         $product = array(
+            'length'=> '5',
+            'width'=> '5',
+            'height'=> '5',
+            'distance_unit'=> 'in',
+            'weight'=> '2',
+            'mass_unit'=> 'lb',
+        );
+        $rates = Shipping::rates($user, $product);
         return view('carts.index', [
-            'carts' => $carts
+            'carts' => $carts,
+            'rates' => $rates->rates
         ]);
     }
 

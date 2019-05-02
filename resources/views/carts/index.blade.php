@@ -79,7 +79,8 @@
                     $('.cart-id', modal).html(response.id);
                     $('.customer', modal).html(response.customer);
                     $('.total', modal).html(response.total);
-
+                    $('.actual_total', modal).html(response.total);
+                    
                     $('[name=first_name]').val(response.cart.customer_first_name);
                     $('[name=last_name]').val(response.cart.customer_last_name);
 
@@ -136,7 +137,12 @@
                 open_checkout_modal($(this).data('cart-id'));
             });
 
-
+            $('.shipping_radio').click(function(){
+                var radioValue = $("input[name='rate']:checked"). val();
+                var oldtotal = $('.actual_total').html();
+                var newTotal = parseFloat(oldtotal) + parseFloat(radioValue.replace("$",""));
+                 $('.total').html(newTotal);
+            })
             // Create a Stripe client.
             var stripe = Stripe('{{ env('STRIPE_KEY') }}');
             window.stripe = stripe;

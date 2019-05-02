@@ -26,6 +26,7 @@
                         <div class="col-md-3">
                             <div style="padding: 4px; background-color: gainsboro; text-align: center;">
                                 <h1 class="total"></h1>
+                                <span class="actual_total" style="display:none"></span>
                                 <br>
                                 <label for="">Total</label>
                             </div>
@@ -56,7 +57,23 @@
 
                     <br>
                     <br>
-
+                    <table>
+                        @foreach ($rates as $rate)
+                        <tr>
+                            <td>
+                                <img src="{{ $rate->provider_image_75 }}" alt="">
+                                {{ $rate->provider }} ({{ $rate->duration_terms }})
+                            </td>
+                            <td width="20%">
+                                <input type="radio" 
+                                       name="rate" 
+                                       value="{{ $rate->amount }}"
+                                       class="shipping_radio">
+                                ${{ $rate->amount }}
+                            </td>
+                        </tr>
+                        @endforeach
+                    </table>
                     <div class="row">
                         {{-- Aackas: Place checkout fields here--}}
                         <div class="col-md-5">
