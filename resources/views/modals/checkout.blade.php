@@ -29,8 +29,27 @@
                             <label for="">Total</label>
                         </div>
                     </div>
+                    
+                    
+                    
                 </div>
-
+                <table>
+                @foreach ($rates as $rate)
+                <tr>
+                    <td>
+                        <img src="{{ $rate->provider_image_75 }}" alt="">
+                        {{ $rate->provider }} ({{ $rate->duration_terms }})
+                    </td>
+                    <td width="20%">
+                        <input type="radio" 
+                               name="rate" 
+                               value="{{ $rate->amount }}"
+                               class="shipping_radio">
+                        ${{ $rate->amount }}
+                    </td>
+                </tr>
+                @endforeach
+            </table>
                 <br>
                 <br>
                 <h4>Checkout data</h4>

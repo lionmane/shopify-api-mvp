@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Cart;
 use App\CartItem;
+use App\User;
+use App\Services\Shipping;
 use App\Library\CustomerHelper;
 use App\Library\ProductHelper;
 use Illuminate\Http\Request;
@@ -13,8 +15,27 @@ class CartsController extends Controller
     public function index()
     {
         $carts = Cart::query()->whereNull('order_id')->get();
+        $user = new User;
+            // Try and validate the address
+            $validate = Shipping::validateAddress($user);
+
+            // Make sure it's not an invalid address this
+            // could also be moved to a custom validator rule
+            if ($validate->object_state == 'INVALID') {
+                return back()->withMessages($validate->messages);
+            }
+            $product = array(
+                'length'=> '5',
+                'width'=> '5',
+                'height'=> '5',
+                'distance_unit'=> 'in',
+                'weight'=> '2',
+                'mass_unit'=> 'lb',
+            );
+            $rates = Shipping::rates($user, $product);
         return view('carts.index', [
-            'carts' => $carts
+            'carts' => $carts,
+            'rates' => $rates->rates
         ]);
     }
 
@@ -56,7 +77,10 @@ class CartsController extends Controller
                 $cart_item->variant_name = $product['variant_name'];
                 $cart_item->unit_price = $product['price'];
                 $cart_item->total_price = 0;
+                $cart_item->shipping = 0;
+                $cart_item->tax = 0;
             }
+
 
             // Add the new quantity and update the item total
             $cart_item->quantity += $quantity;
@@ -87,6 +111,8 @@ class CartsController extends Controller
     {
         try {
             $cart = Cart::findOrFail($cart_id);
+            $user = new User;
+            
             $client = \TaxJar\Client::withApiKey($_ENV['TAXJAR_API_KEY']);
             $client->setApiConfig('headers', [
               'X-TJ-Expected-Response' => 422
@@ -111,13 +137,13 @@ class CartsController extends Controller
                 ]
               ]
             ]);
-
             return [
                 'id' => $cart->id,
                 'cart' => $cart->toArray(),
                 'customer' => $cart->customer_first_name . ' ' . $cart->customer_last_name,
                 'items' => $cart->items,
                 'total' => $cart->total()
+                
             ];
         } catch (\Exception $error) {
             return response('ERROR: ' . $error->getMessage(), 500);

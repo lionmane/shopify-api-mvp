@@ -123,6 +123,16 @@
                 e.preventDefault();
                 open_checkout_modal($(this).data('cart-id'));
             });
+            $('.shipping_radio').click(function(){
+                var radioValue = $("input[name='rate']:checked"). val();
+
+                var oldtotal = $('.total').html();
+
+                var newTotal = parseFloat(oldtotal) + parseFloat(radioValue.replace("$",""));
+                 $('.total').html(newTotal);
+
+            })
+            
             var button = document.querySelector('#submit-button');
             
             braintree.dropin.create({

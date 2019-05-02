@@ -9,6 +9,7 @@
         "braintree/braintree_php": "^3.40",
         "laravel/framework": "5.4.*",
         "laravel/tinker": "~1.0",
+        "shippo/shippo-php": "^1.4",
         "stripe/stripe-php": "^6.33",
         "taxjar/taxjar-php": "^1.8"
     },
